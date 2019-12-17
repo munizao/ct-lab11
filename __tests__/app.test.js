@@ -87,7 +87,7 @@ describe('app routes', () => {
       });
   });
 
-  it('updates an event by id', async() => {
+  it('updates a trip by id', async() => {
     return request(app)
       .patch(`/api/v1/trips/${trip._id}`)
       .send({ name: 'Snowboarding Trip' })
