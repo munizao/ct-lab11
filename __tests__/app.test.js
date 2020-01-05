@@ -18,12 +18,12 @@ describe('app routes', () => {
     await mongoose.connection.dropDatabase();
     trip = await Trip.create({
       name: 'Ski Trip',
-      start: Date(2020, 1, 10),
-      end: Date(2020, 1, 14)
+      start: new Date(2020, 1, 10),
+      end: new Date(2020, 1, 14)
     });
     itineraryItem = await ItineraryItem.create({
-      name: 'Lessons',
-      time: Date(2020, 1, 11),
+      activity: 'Lessons',
+      time: new Date(2020, 1, 11),
       trip: trip._id,
       lat: 45,
       long: 120
@@ -39,8 +39,8 @@ describe('app routes', () => {
       .post('/api/v1/trips')
       .send({
         name: 'European Vacation',
-        start: Date(2020, 6, 10),
-        end: Date(2020, 6, 24)
+        start: new Date(2020, 6, 10).toISOString(),
+        end: new Date(2020, 6, 24).toISOString()
       })
       .then(res => {
         expect(res.body).toEqual({
@@ -82,7 +82,18 @@ describe('app routes', () => {
           name: 'Ski Trip',
           __v: 0,
           start: JSON.parse(JSON.stringify(trip.start)),
-          end: JSON.parse(JSON.stringify(trip.end))
+          end: JSON.parse(JSON.stringify(trip.end)),
+          itinerary: [
+            {
+              _id: itineraryItem._id.toString(),
+              __v: 0,
+              activity: 'Lessons',
+              time: new Date(2020, 1, 11).toISOString(),
+              trip: trip._id.toString(),
+              lat: 45,
+              long: 120
+            }
+          ]
         });
       });
   });
@@ -143,7 +154,8 @@ describe('app routes', () => {
       .delete(`/api/v1/itinerary-items/${itineraryItem._id}`)
       .then(res => {
         expect(res.body).toEqual({
-          _id: expect.any(String),
+          _id: itineraryItem._id.toString(),
+          activity: 'Lessons',
           trip: trip._id.toString(),
           time: expect.any(String),
           lat: 45,
